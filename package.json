@@ -1,0 +1,25 @@
+{
+  "name": "the-best-employee-tracking-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "inquirer": "^7.3.3",
+    "mysql": "^2.18.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lax-Walrus/the-best-employee-tracking-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Lax-Walrus/the-best-employee-tracking-app/issues"
+  },
+  "homepage": "https://github.com/Lax-Walrus/the-best-employee-tracking-app#readme"
+}
