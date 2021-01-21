@@ -35,7 +35,6 @@ async function firstQ() {
 
   switch (answers.crud) {
     case "list":
-      // function not yet created
       listfunc();
       break;
 
@@ -58,4 +57,19 @@ async function firstQ() {
       connection.end();
       break;
   }
+}
+
+// functions
+
+// read function connects to list
+function listfunc() {
+  connection.query(
+    "SELECT employee.first_name, employee.last_name, roles.title, department.department, employee.manager ,roles.salary FROM employee JOIN roles ON employee.role_id=roles.id JOIN department ON roles.department_id=department.id",
+    function (err, res) {
+      if (err) throw err;
+      else console.log("completed");
+      console.table(res);
+      firstQ();
+    }
+  );
 }
