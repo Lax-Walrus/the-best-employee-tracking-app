@@ -2,7 +2,7 @@
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
-![snapshot]:()
+![snapshot]:(https://github.com/Lax-Walrus/the-best-employee-tracking-app/blob/main/gif/2021-01-21%2022-46-22.gif?raw=true)
 
 ## description:
 
