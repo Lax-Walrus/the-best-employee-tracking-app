@@ -1,9 +1,14 @@
 // server in sql
+
 const { O_DIRECTORY } = require("constants");
 const inquirer = require("inquirer");
 const mysql = require("mysql");
 const { listenerCount } = require("process");
 const { async } = require("rxjs");
+const employeeArr = [];
+let tempemp;
+const departmentArr = ["Sales", "HR", "Service", "IT"];
+const roleTitlesArr = ["Manager", "Lead", "Intern", "Engineer"];
 const connection = mysql.createConnection({
   host: "localhost",
 
@@ -16,6 +21,7 @@ const connection = mysql.createConnection({
   // Your password
   password: "password",
   database: "employeeDB",
+  multipleStatements: true,
 });
 
 connection.connect(function (err) {
@@ -29,7 +35,7 @@ async function firstQ() {
     {
       type: "list",
       message: "What would you like to do???",
-      choices: ["list", "add", "update", "remove", "exit"],
+      choices: ["list", "add", "update", "exit"],
       name: "crud",
     },
   ]);
@@ -40,18 +46,12 @@ async function firstQ() {
       break;
 
     case "add":
-      // function not yet created
-      addfunc();
+      addemployee();
       break;
 
     case "update":
       // function not yet created
       updatefunc();
-      break;
-
-    case "remove":
-      // function not yet created
-      deletefunc();
       break;
 
     default:
@@ -74,9 +74,8 @@ function listfunc() {
     }
   );
 }
-
 // write function connects to add
-async function addfunc() {
+async function addemployee() {
   const addanswers = await inquirer.prompt([
     {
       type: "text",
@@ -89,63 +88,135 @@ async function addfunc() {
       message: "Who is there Manager? (leave blank if none)",
       name: "managerName",
     },
-    // { type: "text", message: "What is their role ID?", name: "roleid" },
 
     {
       type: "list",
       message: "What is their title?",
-      choices: ["Manager", "Lead", "Grunt", "Intern"],
+      choices: roleTitlesArr,
       name: "roletitle",
     },
 
     { type: "text", message: "What is their salary?", name: "rolesalary" },
+
     {
       type: "list",
       message: "What is their department",
-      choices: ["Sales", "HR", "Intern", "Engineer"],
+      choices: departmentArr,
       name: "departmentName",
     },
   ]);
-
-  let roleId = 4;
+  let deptId;
+  let roleId;
 
   switch (addanswers.roletitle) {
     case "Manager":
-      roleId === 1;
+      roleId = 1;
       break;
     case "Lead":
-      roleId === 2;
+      roleId = 2;
       break;
-    case "Grunt":
-      roleId === 3;
+    case "Intern":
+      roleId = 3;
       break;
 
     default:
-      roleId === 4;
+      roleId = 4;
+      break;
+  }
+  switch (addanswers.departmentName) {
+    case "Sales":
+      deptId = 1;
+      break;
+    case "HR":
+      deptId = 2;
+      break;
+    case "Service":
+      deptId = 3;
+      break;
+    default:
+      deptId = 4;
       break;
   }
 
+  console.log(addanswers.roletitle);
   connection.query(
-    "INSERT INTO employee SET ?, INSERT INTO roles SET ?, INSERT INTO department SET ?",
+    "INSERT INTO department SET ? ; INSERT INTO roles SET ?; INSERT INTO employee SET ?",
 
     [
+      { department: addanswers.departmentName },
+
+      {
+        title: addanswers.roletitle,
+        salary: addanswers.rolesalary,
+        department_id: deptId,
+      },
       {
         first_name: addanswers.first,
         last_name: addanswers.second,
         manager: addanswers.managerName,
+        role_id: roleId,
       },
-      {
-        title: addanswers.roletitle,
-        salary: addanswers.rolesalary,
-        id: addanswers.roleId,
-      },
-      { department: addanswers.departmentName },
     ],
     function (err, res) {
       if (err) throw err;
       else console.log("completed");
-      console.table(res);
-      firstQ();
+      listfunc();
+    }
+  );
+}
+
+// updated function
+async function updatefunc() {
+  const updatedAns = await connection.query(
+    "SELECT id, first_name, last_name FROM employee",
+    function (err, res) {
+      if (err) throw err;
+      for (i in res) {
+        tempemp = res;
+        const employeefull = `${res[i].first_name} ${res[i].last_name}`;
+        employeeArr.push(employeefull);
+        console.log(employeeArr);
+        tempemp = res;
+      }
+    
+  );
+  inquirer.prompt([
+    {
+      type: "list",
+      message: "Who gets a new role?",
+      choices: employeeArr,
+      name: "promotion",
+    },
+    {
+      type: "list",
+      message: "What is the new role?",
+      choices: roleTitlesArr,
+      name: "newroll",
+    },
+  ]);
+
+  switch (updatedAns.newroll) {
+    case "Manager":
+      roleId = 1;
+      break;
+    case "Lead":
+      roleId = 2;
+      break;
+    case "Intern":
+      roleId = 3;
+      break;
+
+    default:
+      roleId = 4;
+      break;
+  }
+
+  connection.query(
+    'UPDATE employee SET role_id = ? WHERE CONCAT(first_name, " " last_name) = ? ',
+    function (err, res) {
+      if (err) throw err;
+      else console.log("completed");
+      listfunc();
     }
   );
 }
