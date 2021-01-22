@@ -178,7 +178,7 @@ async function updatefunc() {
         console.log(employeeArr);
         tempemp = res;
       }
-    
+    }
   );
   inquirer.prompt([
     {
